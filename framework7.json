@@ -1,0 +1,19 @@
+{
+  "cwd": "/Users/Alex/Documents/JSProjects/Trevare Festival/trevare22-ticketing/trevare22-ticketing-shopapp",
+  "type": [
+    "web"
+  ],
+  "name": "TF22 Ticketing",
+  "framework": "react",
+  "template": "single-view",
+  "bundler": "vite",
+  "cssPreProcessor": false,
+  "theming": {
+    "customColor": false,
+    "color": "#007aff",
+    "darkTheme": true,
+    "iconFonts": true,
+    "fillBars": false
+  },
+  "customBuild": false
+}
