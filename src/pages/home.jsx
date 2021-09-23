@@ -141,7 +141,7 @@ const TicketsList = ({tickets}) => {
         searchIn=".item-title"
       ></Searchbar>
       <List id="tickets-list">
-        { tickets.sort((a,b)  => b.createdAt - a.createdAt).map((ticket, id) => {return(<ListItem key={id} title={ticket?.code} after={ticket?.used ? "Used": "Valid"} ><Icon slot="media" color={ticket?.used ? "yellow" : "green"} f7={ticket?.used ? "checkmark_alt_circle_fill" : "exclamationmark_circle_fill"}></Icon></ListItem>)}) }
+        { tickets.sort((a,b)  => b.createdAt - a.createdAt).map((ticket, id) => {return(<ListItem key={id} title={ticket?.code} after={ticket?.used ? "Used": "Valid"} ><Icon slot="media" color={ticket?.used ? "yellow" : "green"} f7={ticket?.used ? "exclamationmark_circle_fill" : "checkmark_alt_circle_fill" }></Icon></ListItem>)}) }
       </List>
     </>
   )
