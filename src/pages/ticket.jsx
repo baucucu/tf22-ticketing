@@ -3,6 +3,7 @@ import { Page, Navbar, Block, BlockTitle } from 'framework7-react';
 import postscribe from 'postscribe';
 
 const TicketPage = () => {
+
   useEffect(() => {
     postscribe('#ticket', `<script
     src="https://www.universe.com/embed2.js"
@@ -14,7 +15,6 @@ const TicketPage = () => {
   },[])
   return (
     <Page>
-      {/* <Navbar title="Ticket"/> */}
       <div id="ticket"></div>
     </Page>
   );
