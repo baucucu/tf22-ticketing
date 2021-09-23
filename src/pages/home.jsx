@@ -3,15 +3,15 @@ import { Page, Navbar, Block, BlockTitle, List, ListItem,ListInput,Button, Icon,
 import * as Realm from "realm-web";
 import CodeGenerator from 'node-code-generator';
 
-const REALM_APP_ID = "tf22-ukjct"; // e.g. myapp-abcde
-const app = new Realm.App({ id: REALM_APP_ID });
 
-const mongodb = app.currentUser.mongoClient("mongodb-atlas");
-const ticketCodes = mongodb.db("TF22").collection("TicketCodes");
-const shops = mongodb.db("TF22").collection("Shops")
+
+
 
 
 export default function HomePage({f7route, f7router}){
+
+  const REALM_APP_ID = "tf22-ukjct"; // e.g. myapp-abcde
+  const app = new Realm.App({ id: REALM_APP_ID });
 
   const [shop,setShop] = useState()
   const [user, setUser] = useState(app.currentUser)
@@ -23,11 +23,10 @@ export default function HomePage({f7route, f7router}){
     const user = await app.logIn(Realm.Credentials.anonymous());
     setUser(user);
   };
-  
-  
 
   const generateTicketCode = async () => {
-    
+    const mongodb = app.currentUser.mongoClient("mongodb-atlas");
+    const ticketCodes = mongodb.db("TF22").collection("TicketCodes");
     
     var generator = new CodeGenerator();
     var pattern = '###***';
@@ -51,16 +50,23 @@ export default function HomePage({f7route, f7router}){
   }
 
   const getShopTickets = async (shopId) => {  
+    const mongodb = app.currentUser.mongoClient("mongodb-atlas");
+    const ticketCodes = mongodb.db("TF22").collection("TicketCodes");
+
      const res = await ticketCodes.find({shopId: shopId})
      console.log(`tickets lookup for ${shopId}: `, res)
      return res
   }
 
   const getShop = async (shopId) => {
+    const mongodb = app.currentUser.mongoClient("mongodb-atlas");
+    const shops = mongodb.db("TF22").collection("Shops");
     const res = await shops.findOne({shopId: shopId})
     console.log(`shops lookup for ${shopId}: `, res)
     return res
   }
+
+  useEffect(() => {loginAnonymous()},[])
 
   useEffect(() => {
       console.log("route: ", f7route.query.shop);
@@ -70,7 +76,6 @@ export default function HomePage({f7route, f7router}){
           if(res === null) {setError("Invalid shop")}
           else if(res?.shopId){ 
             setShop(res)
-            loginAnonymous()
           }
         })
         
@@ -78,6 +83,8 @@ export default function HomePage({f7route, f7router}){
   },[])
 
   const watchTickets = async () => {
+    const mongodb = app.currentUser.mongoClient("mongodb-atlas");
+    const ticketCodes = mongodb.db("TF22").collection("TicketCodes");
     for await (const change of ticketCodes.watch()) {
       console.log("tickets db change: ", change)
       getShopTickets(f7route.query?.shop).then(res => setTickets([...res]))
@@ -106,7 +113,7 @@ export default function HomePage({f7route, f7router}){
       {/* <BlockTitle>{user?.id}</BlockTitle> */}
       {error && <Block>{error}</Block>}
       {shop && <Shop tickets={tickets} generateTicketCode={generateTicketCode} newCode={newCode}/>}
-      {!shop && !error && <Client f7router={f7router}/>}
+      {!shop && !error && <Client f7router={f7router} app={app}/>}
     </Page>
   );
 }
@@ -123,9 +130,9 @@ const Shop = ({tickets, generateTicketCode, newCode}) => {
 
 const TicketsList = ({tickets}) => {
 
-  useEffect(() => {
-    console.log("tickets: ",tickets)
-  },[tickets])
+  // useEffect(() => {
+  //   console.log("tickets: ",tickets)
+  // },[tickets])
   
   return (
     <>
@@ -156,7 +163,7 @@ const TicketCodeGenerator = ({generateTicketCode, newCode}) => {
   )
 }
 
-const Client = ({f7router}) => {
+const Client = ({f7router, app}) => {
 
   const [code, setCode] = useState("");
   const [enableSubmit, setEnableSubmit] = useState(false)
@@ -165,11 +172,11 @@ const Client = ({f7router}) => {
   const [error, setError] = useState()
 
   const validateCode = async (code) => {
-    console.log("validating: ", ticketCodes)
     if (isLoading) return;
     setIsLoading(true);
     setTimeout(async () => {
-      
+      const mongodb = app.currentUser.mongoClient("mongodb-atlas");
+      const ticketCodes = mongodb.db("TF22").collection("TicketCodes");
       const dbCode = await ticketCodes.findOne({code: code})
       
       console.log("db code lookup: ", dbCode)
